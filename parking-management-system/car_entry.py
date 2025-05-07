@@ -18,7 +18,7 @@ save_dir = 'plates'
 os.makedirs(save_dir, exist_ok=True)
 
 # CSV log file
-csv_file = 'plates_log.csv'
+csv_file = 'testdb.csv'
 if not os.path.exists(csv_file):
     with open(csv_file, 'w', newline='') as f:
         writer = csv.writer(f)
