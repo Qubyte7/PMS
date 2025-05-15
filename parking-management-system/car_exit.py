@@ -10,16 +10,16 @@ from collections import Counter
 import random
 
 # Load YOLOv8 model (same model as entry)
-model = YOLO('/opt/homebrew/runs/detect/train4/weights/best.pt')
+model = YOLO('./brain/best.pt')
 
 # CSV log file
-csv_file = 'plates_log.csv'
+csv_file = 'testdb.csv'
 
 # ===== Auto-detect Arduino Serial Port =====
 def detect_arduino_port():
     ports = list(serial.tools.list_ports.comports())
     for port in ports:
-        if "usbmodem" in port.device or "wchusbmodem" in port.device:
+        if "COM" in port.device:
             return port.device
     return None
 
@@ -32,9 +32,20 @@ else:
     print("[ERROR] Arduino not detected.")
     arduino = None
 
-# ===== Ultrasonic Sensor (mock for now) =====
-def mock_ultrasonic_distance():
-    return random.choice([random.randint(10, 40)] + [random.randint(60, 150)] * 10)
+    # reading distance from ulrasonic sensor
+def read_distance(arduino):
+    """
+    Reads a distance (float) value from the Arduino via serial.
+    Returns the float if valid, or None if invalid/empty.
+    """
+    if arduino and arduino.in_waiting > 0:
+        try:
+            line = arduino.readline().decode('utf-8').strip()
+            return float(line)
+        except ValueError:
+            return None
+    return None
+
 
 # ===== Check payment status in CSV =====
 def is_payment_complete(plate_number):
@@ -43,12 +54,12 @@ def is_payment_complete(plate_number):
     with open(csv_file, 'r') as f:
         reader = csv.DictReader(f)
         for row in reader:
-            if row['Plate Number'] == plate_number and row['Payment Status'] == '1':
+            if row['car_plate'] == plate_number and row['payment_status'] == '1':
                 return True
     return False
 
 # ===== Webcam and Main Loop =====
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 plate_buffer = []
 
 print("[EXIT SYSTEM] Ready. Press 'q' to quit.")
@@ -58,10 +69,10 @@ while True:
     if not ret:
         break
 
-    distance = mock_ultrasonic_distance()
+    distance = read_distance(arduino)
     print(f"[SENSOR] Distance: {distance} cm")
 
-    if distance <= 50:
+    if distance is not None and distance <= 50:
         results = model(frame)
 
         for result in results:
@@ -112,7 +123,7 @@ while True:
                 cv2.imshow("Processed", thresh)
                 time.sleep(0.5)
 
-    annotated_frame = results[0].plot() if distance <= 50 else frame
+    annotated_frame = results[0].plot() if distance is not None and distance <= 50 else frame
     cv2.imshow("Exit Webcam Feed", annotated_frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):

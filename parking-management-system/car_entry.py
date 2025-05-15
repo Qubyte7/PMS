@@ -22,7 +22,7 @@ csv_file = 'testdb.csv'
 if not os.path.exists(csv_file):
     with open(csv_file, 'w', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(['Plate Number', 'Payment Status', 'Timestamp'])
+        writer.writerow(['no', 'entry_time', 'exit_time', 'car_plate', 'due_payment', 'payment_status'])
 
 # ===== Auto-detect Arduino Serial Port =====
 def detect_arduino_port():
@@ -42,12 +42,27 @@ else:
     arduino = None
 
 # ===== Ultrasonic Sensor Setup =====
-import random
-def mock_ultrasonic_distance():
-    return random.choice([random.randint(10, 40)] + [random.randint(60, 150)] * 10)
+# import random
+# def mock_ultrasonic_distance():
+#     return random.choice([random.randint(10, 40)] + [random.randint(60, 150)] * 10)
+
+# ==== reading distance from ultrasonic sensor =====
+def read_distance(arduino):
+    """
+    Reads a distance (float) value from the Arduino via serial.
+    Returns the float if valid, or None if invalid/empty.
+    """
+    if arduino and arduino.in_waiting > 0:
+        try:
+            line = arduino.readline().decode('utf-8').strip()
+            return float(line)
+        except ValueError:
+            return None
+    return None
+
 
 # Initialize webcam
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 plate_buffer = []
 entry_cooldown = 300  # 5 minutes
 last_saved_plate = None
@@ -55,15 +70,18 @@ last_entry_time = 0
 
 print("[SYSTEM] Ready. Press 'q' to exit.")
 
+entry_count = sum(1 for _ in open(csv_file)) - 1
+
 while True:
     ret, frame = cap.read()
     if not ret:
         break
 
-    distance = mock_ultrasonic_distance()
+    distance = read_distance(arduino)
     print(f"[SENSOR] Distance: {distance} cm")
 
-    if distance <= 50:
+
+    if distance is not None and distance <= 50:
         results = model(frame)
 
         for result in results:
@@ -103,7 +121,12 @@ while True:
 
                                     with open(csv_file, 'a', newline='') as f:
                                         writer = csv.writer(f)
-                                        writer.writerow([most_common, 0,time.strftime('%Y-%m-%d %H:%M:%S')])
+                                        entry_count += 1
+                                        writer.writerow([
+                                            entry_count,
+                                            time.strftime('%Y-%m-%d %H:%M:%S'),
+                                            '', most_common, '', 0
+                                        ])
                                     print(f"[SAVED] {most_common} logged to CSV.")
 
                                     if arduino:
@@ -124,7 +147,7 @@ while True:
                 cv2.imshow("Processed", thresh)
                 time.sleep(0.5)
 
-    annotated_frame = results[0].plot() if distance <= 50 else frame
+    annotated_frame = results[0].plot() if distance is not None and distance <= 50 else frame
     cv2.imshow('Webcam Feed', annotated_frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):

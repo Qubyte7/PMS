@@ -10,7 +10,7 @@ import csv
 from collections import Counter
 import platform
 
-model = YOLO('.brain/best.pt')
+model = YOLO('./brain/best.pt')
 save_dir = 'plates'
 os.makedirs(save_dir, exist_ok=True)
 
@@ -53,7 +53,7 @@ if arduino:
     time.sleep(2)
 
 print("[DEBUG] Attempting to open camera...")
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 if cap.isOpened():
     print("[DEBUG] Camera opened successfully.")
 else:
@@ -77,7 +77,7 @@ while True:
     distance = read_distance(arduino)
     if distance is None:
         print("[WARNING] No distance data from Arduino.")
-        distance = 1000
+        distance = 40
 
     results = model(frame)
     for result in results:
