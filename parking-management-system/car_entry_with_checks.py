@@ -7,7 +7,6 @@ import serial
 import serial.tools.list_ports
 import csv
 from collections import Counter
-import datetime # Import datetime
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\user\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
 
@@ -25,44 +24,11 @@ if not os.path.exists(csv_file):
         writer = csv.writer(f)
         writer.writerow(['no', 'entry_time', 'exit_time', 'car_plate', 'due_payment', 'payment_status'])
 
-# --- UI Communication Files ---
-ENTRY_STATUS_FILE = 'entry_gate_status.txt'
-DETECTED_PLATE_FILE = 'detected_plate.txt'
-LOG_FILE = 'parking_system_log.txt'
-
-def update_ui_status(gate_status, detected_plate=None, log_message=None):
-    """
-    Updates status files for UI communication.
-    """
-    try:
-        with open(ENTRY_STATUS_FILE, 'w') as f:
-            f.write(gate_status)
-    except IOError as e:
-        print(f"Error writing to {ENTRY_STATUS_FILE}: {e}")
-
-    if detected_plate:
-        try:
-            with open(DETECTED_PLATE_FILE, 'w') as f:
-                f.write(detected_plate)
-        except IOError as e:
-            print(f"Error writing to {DETECTED_PLATE_FILE}: {e}")
-
-    if log_message:
-        try:
-            with open(LOG_FILE, 'a') as f:
-                f.write(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - ENTRY: {log_message}\n")
-        except IOError as e:
-            print(f"Error writing to {LOG_FILE}: {e}")
-
-
 # ===== Auto-detect Arduino Serial Port =====
 def detect_arduino_port():
-    """
-    Detects the Arduino serial port. Adjust 'COM13' or 'wchusbmodem' as per your Arduino setup.
-    """
     ports = list(serial.tools.list_ports.comports())
     for port in ports:
-        if "COM13" in port.device or "wchusbmodem" in port.device: # Specific to your previous setup
+        if "COM13" in port.device or "wchusbmodem" in port.device:
             return port.device
     return None
 
@@ -70,26 +36,17 @@ arduino_port = detect_arduino_port()
 if arduino_port:
     print(f"[CONNECTED] Arduino on {arduino_port}")
     arduino = serial.Serial(arduino_port, 9600, timeout=1)
-    time.sleep(2) # Allow time for Arduino to initialize
-    update_ui_status("Gate Closed", log_message="Arduino connected.")
+    time.sleep(2)
 else:
     print("[ERROR] Arduino not detected.")
     arduino = None
-    update_ui_status("Gate Status Unknown", log_message="Arduino NOT connected!")
 
-# ==== Reading distance from ultrasonic sensor =====
-def read_distance(arduino):
-    """
-    Reads a distance (float) value from the Arduino via serial.
-    Returns the float if valid, or None if invalid/empty.
-    """
-    if arduino and arduino.in_waiting > 0:
-        try:
-            line = arduino.readline().decode('utf-8').strip()
-            return float(line)
-        except ValueError:
-            return None
-    return None
+# ===== Ultrasonic Sensor Setup =====
+# import random
+# def mock_ultrasonic_distance():
+#     return random.choice([random.randint(10, 40)] + [random.randint(60, 150)] * 10)
+
+# ==== reading distance from ultrasonic sensor =====
 
 # ===== Function to check if car is already in parking (updated to check latest record) =====
 def is_car_already_in_parking(plate_number):
@@ -123,42 +80,43 @@ def is_car_already_in_parking(plate_number):
     return False # No record found or all records are for exited/paid sessions
 
 
+
+def read_distance(arduino):
+    """
+    Reads a distance (float) value from the Arduino via serial.
+    Returns the float if valid, or None if invalid/empty.
+    """
+    if arduino and arduino.in_waiting > 0:
+        try:
+            line = arduino.readline().decode('utf-8').strip()
+            return float(line)
+        except ValueError:
+            return None
+    return None
+
+
 # Initialize webcam
 cap = cv2.VideoCapture(0)
-if not cap.isOpened():
-    print("[ERROR] Could not open webcam.")
-    update_ui_status("System Error", log_message="Webcam NOT detected!")
-    exit() # Exit if webcam isn't available
-
 plate_buffer = []
-entry_cooldown = 300  # 5 minutes cooldown to prevent rapid re-entry of the same car
+entry_cooldown = 300  # 5 minutes
 last_saved_plate = None
 last_entry_time = 0
 
 print("[SYSTEM] Ready. Press 'q' to exit.")
-update_ui_status("Gate Closed", log_message="Entry system ready.")
 
-# Get initial entry count for 'no' column in CSV
-# Subtract 1 for the header row
-try:
-    with open(csv_file, 'r') as f:
-        entry_count = sum(1 for _ in f) - 1
-        if entry_count < 0: # Handle case of empty or only header file
-            entry_count = 0
-except FileNotFoundError:
-    entry_count = 0 # If file doesn't exist, start count from 0
+entry_count = sum(1 for _ in open(csv_file)) - 1
 
 while True:
     ret, frame = cap.read()
     if not ret:
-        update_ui_status("System Error", log_message="Failed to read frame from webcam!")
         break
 
     distance = read_distance(arduino)
-    # print(f"[SENSOR] Distance: {distance} cm") # Uncomment for debugging distance
+    print(f"[SENSOR] Distance: {distance} cm")
 
-    if distance is not None and distance <= 50: # Car detected by ultrasonic sensor
-        results = model(frame) # Perform YOLO detection
+
+    if distance is not None and distance <= 50:
+        results = model(frame)
 
         for result in results:
             for box in result.boxes:
@@ -176,67 +134,62 @@ while True:
                 ).strip().replace(" ", "")
 
                 # Plate Validation
-                if "RA" in plate_text: # Assuming "RA" is a common prefix for valid plates
+                if "RA" in plate_text:
                     start_idx = plate_text.find("RA")
                     plate_candidate = plate_text[start_idx:]
-                    if len(plate_candidate) >= 7: # Check for minimum length
-                        plate_candidate = plate_candidate[:7] # Take first 7 characters
+                    if len(plate_candidate) >= 7:
+                        plate_candidate = plate_candidate[:7]
                         prefix, digits, suffix = plate_candidate[:3], plate_candidate[3:6], plate_candidate[6]
-                        if (prefix.isalpha() and prefix.isupper() and # Validate format
+                        if (prefix.isalpha() and prefix.isupper() and
                             digits.isdigit() and suffix.isalpha() and suffix.isupper()):
                             print(f"[VALID] Plate Detected: {plate_candidate}")
-                            update_ui_status("Gate Closed", detected_plate=plate_candidate, log_message=f"Plate detected: {plate_candidate}")
                             plate_buffer.append(plate_candidate)
 
-                            # Decision after 3 consistent captures
+                            # Decision after 3 captures
                             if len(plate_buffer) >= 3:
                                 most_common = Counter(plate_buffer).most_common(1)[0][0]
                                 current_time = time.time()
 
-                                # Check for duplicate entry within cooldown or if car is already in parking
-                                if (most_common == last_saved_plate and (current_time - last_entry_time) < entry_cooldown):
-                                    print("[SKIPPED] Duplicate within 5 min window.")
-                                    update_ui_status("Gate Closed", log_message=f"Plate {most_common} skipped (duplicate/cooldown).")
-                                elif is_car_already_in_parking(most_common): # Check if car is already marked as in parking
+                                if is_car_already_in_parking(most_common):  # Check if car is already marked as in parking
                                     print(f"[DENIED] Car {most_common} is already in parking.")
-                                    update_ui_status("Gate Closed", log_message=f"Car {most_common} denied entry: already in parking.")
+                                    # Uncomment and implement update_ui_status if needed
+                                    # update_ui_status("Gate Closed", log_message=f"Car {most_common} denied entry: already in parking.")
                                     if arduino:
                                         # Optionally send a signal to Arduino for "denied entry" (e.g., buzzer)
                                         # arduino.write(b'2') # Assuming '2' triggers a buzzer
                                         # time.sleep(2) # Buzzer duration
                                         # arduino.write(b'0') # Turn off buzzer
                                         pass
-                                else:
-                                    # Log new entry to CSV
+                                elif (most_common != last_saved_plate or
+                                      (current_time - last_entry_time) > entry_cooldown):
+
                                     with open(csv_file, 'a', newline='') as f:
                                         writer = csv.writer(f)
                                         entry_count += 1
                                         writer.writerow([
                                             entry_count,
                                             time.strftime('%Y-%m-%d %H:%M:%S'),
-                                            '', most_common, '', 0 # Empty exit_time, 0 for unpaid
+                                            '', most_common, '', 0
                                         ])
                                     print(f"[SAVED] {most_common} logged to CSV.")
-                                    update_ui_status("Gate Closed", log_message=f"Car {most_common} recorded for entry.")
 
-                                    # Open gate if Arduino is connected
                                     if arduino:
-                                        arduino.write(b'1') # Signal to open gate
+                                        arduino.write(b'1')
                                         print("[GATE] Opening gate (sent '1')")
-                                        update_ui_status("Gate Open", log_message="Entry gate opening...")
-                                        time.sleep(15) # Gate open duration
-                                        arduino.write(b'0') # Signal to close gate
+                                        time.sleep(15)  # Gate open duration
+                                        arduino.write(b'0')
                                         print("[GATE] Closing gate (sent '0')")
-                                        update_ui_status("Gate Closed", log_message="Entry gate closed.")
 
                                     last_saved_plate = most_common
                                     last_entry_time = current_time
+                                else:
+                                    print("[SKIPPED] Duplicate within 5 min window.")
 
-                                plate_buffer.clear() # Clear buffer after decision
+                                plate_buffer.clear()
 
                 cv2.imshow("Plate", plate_img)
                 cv2.imshow("Processed", thresh)
-                # time.sleep(0.1) # Small delay to allow UI to update if needed
+                time.sleep(0.5)
 
     annotated_frame = results[0].plot() if distance is not None and distance <= 50 else frame
     cv2.imshow('Webcam Feed', annotated_frame)
@@ -248,4 +201,3 @@ cap.release()
 if arduino:
     arduino.close()
 cv2.destroyAllWindows()
-update_ui_status("System Offline", log_message="Entry system shut down.")
