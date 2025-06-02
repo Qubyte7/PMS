@@ -4,3 +4,9 @@
 2025-06-02 15:42:44 - [PROCESS_PAYMENT] CONNECTED to Arduino on COM16.
 2025-06-02 15:43:40 - [PROCESS_PAYMENT] Program terminated by user.
 2025-06-02 15:43:40 - [PROCESS_PAYMENT] Serial port closed.
+2025-06-02 18:41:41 - [PROCESS_PAYMENT] CONNECTED to Arduino on COM16.
+2025-06-02 18:42:15 - [PROCESS_PAYMENT] Program terminated by user.
+2025-06-02 18:42:15 - [PROCESS_PAYMENT] Serial port closed.
+2025-06-02 18:56:10 - [PROCESS_PAYMENT] CONNECTED to Arduino on COM16.
+2025-06-02 18:56:34 - [PROCESS_PAYMENT] Program terminated by user.
+2025-06-02 18:56:34 - [PROCESS_PAYMENT] Serial port closed.

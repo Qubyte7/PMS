@@ -141,24 +141,30 @@ def handle_exit(plate_number, arduino_serial):
                     if arduino_serial:
                         arduino_serial.write(b'3') # Trigger alert for old payment
                         print("[ALERT] Sent '3' to Arduino (Old Payment / Denied Exit).")
-                        time.sleep(3)
+                        time.sleep(5)
                         arduino_serial.write(b'S')
                     return False # Access Denied
             except ValueError:
                 print(f"[ERROR] Invalid 'exit_time' format in CSV for {plate_number}: {latest_entry_for_plate['exit_time']}. Triggering alert.")
                 if arduino_serial:
                     arduino_serial.write(b'2')
+                    time.sleep(5)
+                    arduino_serial.write(b'S')
                 return False # Access Denied
         # Scenario 3: Car is in parking but in an unhandled state (e.g., payment_status not 0 or 1)
         else:
             print(f"[ACCESS DENIED] Unhandled status for {plate_number}: Payment_status={latest_entry_for_plate['payment_status']}, Exit_time='{latest_entry_for_plate['exit_time']}'. Triggering alert.")
             if arduino_serial:
                 arduino_serial.write(b'3')
+                time.sleep(5)
+                arduino_serial.write(b'S')
             return False # Access Denied
     else:
         print(f"[ACCESS DENIED] No entry record found for {plate_number}. Triggering alert.")
         if arduino_serial:
             arduino_serial.write(b'2')
+            time.sleep(5)
+            arduino_serial.write(b'S')
         return False # Access Denied
 
 
