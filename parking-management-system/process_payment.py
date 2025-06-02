@@ -21,7 +21,7 @@ def detect_arduino_port():
             if "usbmodem" in port.device or "usbserial" in port.device:
                 return port.device
         elif system == "Windows":
-            if "COM14" in port.device:
+            if "COM15" in port.device:
                 return port.device
     return None
 

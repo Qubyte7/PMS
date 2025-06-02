@@ -10,7 +10,7 @@ from collections import Counter
 import random
 
 # Load YOLOv8 model (same model as entry)
-model = YOLO('./brain/best.pt')
+model = YOLO('./brain/best3.pt')
 
 # CSV log file
 csv_file = 'testdb.csv'
@@ -19,7 +19,7 @@ csv_file = 'testdb.csv'
 def detect_arduino_port():
     ports = list(serial.tools.list_ports.comports())
     for port in ports:
-        if "COM" in port.device:
+        if "COM13" in port.device:
             return port.device
     return None
 

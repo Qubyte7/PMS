@@ -17,7 +17,7 @@ long currentBalance = 0;
 unsigned long readySentTime = 0;
 const unsigned long RESPONSE_TIMEOUT = 10000; // 10 seconds
 
-void setup() {
+void setup() { 
     Serial.begin(9600);
     SPI.begin();
     mfrc522.PCD_Init();

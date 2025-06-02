@@ -148,3 +148,31 @@
 2025-06-02 05:32:54 - ENTRY: Plate detected: RAH972U
 2025-06-02 05:32:55 - ENTRY: Plate detected: RAH972U
 2025-06-02 05:33:00 - ENTRY: Entry system shut down.
+2025-06-02 06:09:19 - [PROCESS_PAYMENT] ERROR: Arduino not found.
+2025-06-02 06:09:34 - [PROCESS_PAYMENT] CONNECTED to Arduino on COM15.
+2025-06-02 06:12:58 - [PROCESS_PAYMENT] Program terminated by user.
+2025-06-02 06:12:58 - [PROCESS_PAYMENT] Serial port closed.
+2025-06-02 06:15:01 - [PROCESS_PAYMENT] SERIAL ERROR: could not open port 'COM15': PermissionError(13, 'Access is denied.', None, 5).
+2025-06-02 06:15:21 - [PROCESS_PAYMENT] CONNECTED to Arduino on COM15.
+2025-06-02 06:15:47 - [PROCESS_PAYMENT] Program terminated by user.
+2025-06-02 06:15:47 - [PROCESS_PAYMENT] Serial port closed.
+2025-06-02 06:18:29 - [PROCESS_PAYMENT] CONNECTED to Arduino on COM15.
+2025-06-02 06:19:56 - [PROCESS_PAYMENT] SERIAL ERROR: ClearCommError failed (OSError(22, 'The I/O operation has been aborted because of either a thread exit or an application request.', None, 995)).
+2025-06-02 06:19:56 - [PROCESS_PAYMENT] Serial port closed.
+2025-06-02 06:42:41 - [PROCESS_PAYMENT] CONNECTED to Arduino on COM15.
+2025-06-02 06:44:06 - [PROCESS_PAYMENT] Program terminated by user.
+2025-06-02 06:44:06 - [PROCESS_PAYMENT] Serial port closed.
+2025-06-02 06:44:27 - [PROCESS_PAYMENT] CONNECTED to Arduino on COM15.
+2025-06-02 06:45:26 - [PROCESS_PAYMENT] Program terminated by user.
+2025-06-02 06:45:26 - [PROCESS_PAYMENT] Serial port closed.
+2025-06-02 06:59:17 - EXIT: Arduino connected.
+2025-06-02 06:59:22 - EXIT: Exit system ready.
+2025-06-02 06:59:55 - EXIT: Exit system shut down.
+2025-06-02 07:03:34 - EXIT: Arduino NOT connected!
+2025-06-02 07:03:38 - EXIT: Exit system ready.
+2025-06-02 07:03:55 - EXIT: Arduino NOT connected!
+2025-06-02 07:03:59 - EXIT: Exit system ready.
+2025-06-02 07:04:06 - EXIT: Exit system shut down.
+2025-06-02 07:06:41 - EXIT: Arduino connected.
+2025-06-02 07:06:46 - EXIT: Exit system ready.
+2025-06-02 07:07:06 - EXIT: Exit system shut down.
