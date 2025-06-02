@@ -5,7 +5,7 @@ import serial.tools.list_ports
 import platform
 from datetime import datetime
 
-CSV_FILE = 'plates_log.csv'
+CSV_FILE = 'testdb.csv'
 RATE_PER_MINUTE = 5  # Amount charged per minute
 
 
@@ -21,7 +21,7 @@ def detect_arduino_port():
             if "usbmodem" in port.device or "usbserial" in port.device:
                 return port.device
         elif system == "Windows":
-            if "COM8" in port.device:
+            if "COM14" in port.device:
                 return port.device
     return None
 
@@ -52,7 +52,6 @@ def process_payment(plate, balance, ser):
     try:
         with open(CSV_FILE, 'r') as f:
             rows = list(csv.reader(f))
-        
 
         header = rows[0]
         entries = rows[1:]

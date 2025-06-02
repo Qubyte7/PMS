@@ -59,7 +59,7 @@ def is_payment_complete(plate_number):
     return False
 
 # ===== Webcam and Main Loop =====
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 plate_buffer = []
 
 print("[EXIT SYSTEM] Ready. Press 'q' to quit.")

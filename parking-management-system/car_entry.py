@@ -11,7 +11,7 @@ from collections import Counter
 pytesseract.pytesseract.tesseract_cmd = r'C:\Users\user\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
 
 # Load YOLOv8 model
-model = YOLO('./brain/best.pt')
+model = YOLO('./brain/best3.pt')
 
 # Plate save directory
 save_dir = 'plates'
@@ -28,7 +28,7 @@ if not os.path.exists(csv_file):
 def detect_arduino_port():
     ports = list(serial.tools.list_ports.comports())
     for port in ports:
-        if "COM" in port.device or "wchusbmodem" in port.device:
+        if "COM13" in port.device or "wchusbmodem" in port.device:
             return port.device
     return None
 
@@ -62,7 +62,7 @@ def read_distance(arduino):
 
 
 # Initialize webcam
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 plate_buffer = []
 entry_cooldown = 300  # 5 minutes
 last_saved_plate = None
