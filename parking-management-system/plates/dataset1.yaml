@@ -1,0 +1,7 @@
+# File: dataset.yaml
+train: /content/drive/MyDrive/ANPR_yolov5_/dataset2/plates/arranged_dataset/images/train # path to the folder with training images
+val: /content/drive/MyDrive/ANPR_yolov5_/dataset2/plates/arranged_dataset/images/val # path to the folder with validation images
+
+# Classes
+nc: 1 # number of classes
+names: ["RAG557V"] # class names
