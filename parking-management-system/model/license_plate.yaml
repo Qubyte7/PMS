@@ -1,6 +1,0 @@
-path: /Users/gabriel/aiProjects/register-entering-vehicle/dataset
-train: /Users/gabriel/aiProjects/register-entering-vehicle/dataset/train/images
-val: /Users/gabriel/aiProjects/register-entering-vehicle/dataset/val/images
-
-names:
-  0: license_plate
