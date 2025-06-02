@@ -1,0 +1,4 @@
+timestamp,car_plate,attempt_type,reason,details
+2025-06-02 15:38:54,RAG557V,ENTRY_DENIED,Car already in parking,
+2025-06-02 15:40:04,RAG557I,EXIT_DENIED,No entry record found,
+2025-06-02 15:42:03,RAG557V,EXIT_DENIED,Payment not made,Due: 

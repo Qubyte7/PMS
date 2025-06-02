@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>IGIPANGU Dashboard</h1>
+
+        <div class="dashboard-controls">
+            <button id="reloadButton" class="btn-reload">Reload Data</button>
+        </div>
+
+        <section class="dashboard-section">
+            <h2>Current Parking Activity</h2>
+            <div class="table-container">
+                <table id="parkingDataTable">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Entry Time</th>
+                            <th>Exit Time</th>
+                            <th>Car Plate</th>
+                            <th>Due Payment</th>
+                            <th>Payment Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+            <p>Payment Status: 0 = Unpaid, 1 = Paid</p>
+        </section>
+
+        <section class="dashboard-section alerts-section">
+            <h2>System Alerts</h2>
+            <div class="alerts-list" id="alertsList">
+                <p class="no-alerts">No active alerts.</p>
+                </div>
+        </section>
+    </div>
+
+    <script>
+        async function fetchParkingData() {
+            try {
+                const response = await fetch('/api/parking_data');
+                const data = await response.json();
+                const tbody = document.querySelector('#parkingDataTable tbody');
+                tbody.innerHTML = ''; // Clear existing data
+
+                data.forEach(row => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${row.no}</td>
+                        <td>${row.entry_time}</td>
+                        <td>${row.exit_time}</td>
+                        <td>${row.car_plate}</td>
+                        <td>${parseFloat(row.due_payment).toFixed(2) || 'N/A'}</td>
+                        <td class="${row.payment_status === '1' ? 'status-paid' : 'status-unpaid'}">
+                            ${row.payment_status === '1' ? 'Paid' : 'Unpaid'}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error fetching parking data:', error);
+            }
+        }
+
+        async function fetchAlerts() {
+            try {
+                const response = await fetch('/api/alerts');
+                const alerts = await response.json();
+                const alertsList = document.getElementById('alertsList');
+                alertsList.innerHTML = ''; // Clear existing alerts
+
+                if (alerts.length === 0) {
+                    alertsList.innerHTML = '<p class="no-alerts">No active alerts.</p>';
+                    return;
+                }
+
+                alerts.forEach(alert => {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.classList.add('alert-item');
+                    alertDiv.classList.add('alert-unauthorized'); // Specific class for highlighting
+
+                    alertDiv.innerHTML = `
+                        <span class="alert-timestamp">${alert.timestamp}</span>
+                        <span class="alert-plate">${alert.plate}</span>
+                        <p class="alert-message">${alert.message}</p>
+                    `;
+                    alertsList.appendChild(alertDiv);
+                });
+            } catch (error) {
+                console.error('Error fetching alerts:', error);
+            }
+        }
+
+        // Function to reload the entire page
+        function reloadPage() {
+            location.reload();
+        }
+
+        // Fetch data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchParkingData();
+            fetchAlerts();
+            // Refresh data every 5 seconds (this will continue)
+            setInterval(fetchParkingData, 5000);
+            setInterval(fetchAlerts, 5000);
+
+            // NEW: Add event listener for the reload button
+            document.getElementById('reloadButton').addEventListener('click', reloadPage);
+        });
+    </script>
+</body>
+</html>

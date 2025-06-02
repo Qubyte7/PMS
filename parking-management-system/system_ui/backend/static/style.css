@@ -1,0 +1,191 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6; /* Light background */
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+}
+
+h1, h2 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 25px;
+}
+
+h1 {
+    font-size: 2.5em;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 15px;
+    margin-top: 0;
+}
+
+h2 {
+    font-size: 1.8em;
+    color: #34495e;
+}
+
+/* NEW: Styles for the dashboard controls and button */
+.dashboard-controls {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.btn-reload {
+    background-color: #007bff; /* Primary blue color */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+}
+
+.btn-reload:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.dashboard-section {
+    margin-bottom: 40px;
+    padding: 25px;
+    background-color: #ecf0f1; /* Light gray section background */
+    border-radius: 8px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Table Styling */
+.table-container {
+    overflow-x: auto; /* Ensures responsiveness for tables */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden; /* For rounded corners on tables */
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #4a69bd; /* Dark blue header */
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+tr:nth-child(even) {
+    background-color: #f8f8f8; /* Zebra striping */
+}
+
+tr:hover {
+    background-color: #e9eff7; /* Hover effect */
+}
+
+.status-paid {
+    color: #27ae60; /* Green for paid */
+    font-weight: bold;
+}
+
+.status-unpaid {
+    color: #e74c3c; /* Red for unpaid */
+    font-weight: bold;
+}
+
+/* Alerts Section Styling */
+.alerts-section {
+    background-color: #fdeded; /* Light red/pink background for alerts */
+    border: 1px solid #f0b2b2;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.1);
+}
+
+.alerts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.alert-item {
+    padding: 15px;
+    border-radius: 6px;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.alert-item.alert-unauthorized {
+    background-color: #ffe6e6; /* Even stronger red for unauthorized */
+    border-left: 5px solid #e74c3c; /* Red border on the left */
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.2);
+}
+
+.alert-timestamp {
+    font-weight: bold;
+    color: #555;
+    margin-right: 10px;
+}
+
+.alert-plate {
+    font-weight: bold;
+    color: #2c3e50;
+    background-color: #dbe4f1;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', Courier, monospace; /* Monospace for plate */
+}
+
+.alert-message {
+    margin-top: 8px;
+    color: #666;
+    font-size: 0.95em;
+}
+
+.no-alerts {
+    text-align: center;
+    color: #7f8c8d;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Basic Responsiveness */
+@media (max-width: 768px) {
+    .container {
+        margin: 15px;
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    h2 {
+        font-size: 1.5em;
+    }
+
+    th, td {
+        padding: 8px 10px;
+        font-size: 0.9em;
+    }
+
+    .btn-reload {
+        width: 100%; /* Full width on smaller screens */
+    }
+}

@@ -7,7 +7,7 @@ from datetime import datetime
 import re # Import regex for more robust cleaning
 
 CSV_FILE = 'testdb.csv'
-RATE_PER_MINUTE = 5  # Amount charged per minute
+RATE_PER_MINUTE = 8.33  # Amount charged per minute
 
 
 def detect_arduino_port():
@@ -22,7 +22,7 @@ def detect_arduino_port():
             if "usbmodem" in port.device or "usbserial" in port.device:
                 return port.device
         elif system == "Windows":
-            if "COM15" in port.device: # Assuming COM14 is the dedicated port for Arduino payment
+            if "COM16" in port.device: # Assuming COM14 is the dedicated port for Arduino payment
                 return port.device
     return None
 
