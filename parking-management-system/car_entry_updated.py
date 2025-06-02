@@ -171,7 +171,7 @@ while True:
                                     if arduino:
                                         arduino.write(b'3') # Send '3' for PAYMENT_PENDING/DENIED ENTRY
                                         print("[ALERT] Denied entry, triggering warning buzzer (sent '3')")
-                                        time.sleep(5) # buzzer beeping
+                                        time.sleep(10) # buzzer beeping
                                         arduino.write(b'S') # Send 'S' to stop buzzer
                                     plate_buffer.clear() # Clear buffer immediately after denial
 

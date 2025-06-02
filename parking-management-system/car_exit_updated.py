@@ -119,7 +119,7 @@ def handle_exit(plate_number, arduino_serial):
             if arduino_serial:
                 arduino_serial.write(b'2')
                 print("[ALERT] Sent '2' to Arduino (Payment Pending/Denied Exit).")
-                time.sleep(3)
+                time.sleep(10)
                 arduino_serial.write(b'S')
                 print("[ALERT] Sent 'S' to Arduino to stop alert after initial burst.")
             return False
@@ -149,6 +149,8 @@ def handle_exit(plate_number, arduino_serial):
                 log_unauthorized_attempt(plate_number, "EXIT_DENIED", "Invalid record data", f"Invalid exit_time format: {latest_entry_for_plate['exit_time']}")
                 if arduino_serial:
                     arduino_serial.write(b'2')
+                    time.sleep(10)
+                    arduino_serial.write(b'S')
                 return False
         # Scenario 3: Car is in parking but in an unhandled state
         else:
@@ -157,6 +159,8 @@ def handle_exit(plate_number, arduino_serial):
             log_unauthorized_attempt(plate_number, "EXIT_DENIED", "Unhandled status", f"Status: {latest_entry_for_plate['payment_status']}, Exit Time: '{latest_entry_for_plate['exit_time']}'")
             if arduino_serial:
                 arduino_serial.write(b'3')
+                time.sleep(5)
+                arduino_serial.write(b'S')
             return False
     else:
         print(f"[ACCESS DENIED] No entry record found for {plate_number}. Triggering alert.")
